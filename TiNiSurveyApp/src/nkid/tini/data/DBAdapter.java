@@ -20,7 +20,7 @@ public class DBAdapter {
 	private static final String DATABASE_CREATE = "create table Poll("
 			+ KEY_ID + " integer primary key autoincrement, "
 			+ KEY_NAME + " text not null, " + KEY_DESCRIPTION + " text,"
-			+ KEY_VOTE + " integer not null, " + KEY_DATETIME + " text not null);";
+			+ KEY_VOTE + " integer not null, " + KEY_DATETIME + " datetime default (datetime('now','localtime')));";
 	
 	private static final String DATABASE_NAME = "tiNiSurveyDB";
 	private static final String DATABASE_TABLE = "Poll";
@@ -71,7 +71,7 @@ public class DBAdapter {
 		initialValues.put(KEY_NAME, poll.getName());
 		initialValues.put(KEY_DESCRIPTION, poll.getDescription());
 		initialValues.put(KEY_VOTE, poll.getVote());
-		initialValues.put(KEY_DATETIME, poll.getDatetime());
+		//initialValues.put(KEY_DATETIME, poll.getDatetime());
 		
 		mDB.insertOrThrow(DATABASE_TABLE, null, initialValues);
 	}
@@ -90,5 +90,40 @@ public class DBAdapter {
 
 		c = mDB.rawQuery("SELECT * FROM Poll", null);
 		return c.getCount();
+	}
+	
+	public int getOverallResults(int vote) {
+		Cursor mCursor = mDB.query(DATABASE_TABLE, new String [] { KEY_VOTE }, 
+				KEY_VOTE + " = " + vote , null, null, null, null);
+		
+		return mCursor.getCount();
+	}
+	
+	public int getTodayResult(String date, int vote) {
+		Cursor mCursor = mDB.query(DATABASE_TABLE, new String [] { KEY_VOTE }, 
+				KEY_VOTE + " = " + vote + " AND date(" + KEY_DATETIME 
+				+ ") = '" + date + "'", 
+				null, null, null, null);
+		
+		return mCursor.getCount();
+	}
+	
+	public int getResultByMonth(int month, int year, int vote) {
+		String strMonth = month < 10 ? ("0" + month) : (month + "");
+		Cursor mCursor = mDB.query(DATABASE_TABLE, new String [] { KEY_VOTE }, 
+				KEY_VOTE + " = " + vote + " AND strftime('%m', Datetime) = '" + strMonth + "'"
+				+ " AND strftime('%Y', Datetime) = '" + year + "'",
+				null, null, null, null);
+		
+		return mCursor.getCount();
+	}
+	
+	public int getResultByWeek(int vote) {
+		Cursor mCursor = mDB.query(DATABASE_TABLE, new String [] { KEY_VOTE }, 
+				KEY_VOTE + " = " + vote + " AND (date(" + KEY_DATETIME + ") >= date('now', 'localtime', '-7 day') "
+						+ "AND date(" + KEY_DATETIME + ") < date('now', 'localtime'))",
+				null, null, null, null);
+		
+		return mCursor.getCount();
 	}
 }
