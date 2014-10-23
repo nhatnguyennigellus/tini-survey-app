@@ -1,5 +1,6 @@
 package nkid.tini.tinisurveyapp;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date; 
 import java.util.Properties; 
 
@@ -25,7 +26,8 @@ public class Mail extends javax.mail.Authenticator {
 	private String _user; 
 	private String _pass; 
  
-	private String[] _to; 
+	private String[] _to;
+	private String[] _cc;
 	private String _from; 
  
 	private String _port; 
@@ -79,19 +81,31 @@ public class Mail extends javax.mail.Authenticator {
 	public boolean send() throws MessagingException, AddressException { 
 		Properties props = _setProperties(); 
  
-		if(!_user.equals("") && !_pass.equals("") && _to.length > 0 && !_from.equals("") && !_subject.equals("") && !_body.equals("")) { 
+		if(!_user.equals("") && !_pass.equals("") && _to.length > 0 && _cc.length > 0 
+				&& !_from.equals("") && !_subject.equals("") && !_body.equals("")) { 
 			Session session = Session.getInstance(props, this); 
  
 			MimeMessage msg = new MimeMessage(session); 
  
-			msg.setFrom(new InternetAddress(_from)); 
+			try {
+				msg.setFrom(new InternetAddress(_from, "tiNi Survey App"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
  
 			InternetAddress[] addressTo = new InternetAddress[_to.length]; 
 			for (int i = 0; i < _to.length; i++) { 
 				addressTo[i] = new InternetAddress(_to[i]); 
 			} 
-			msg.setRecipients(MimeMessage.RecipientType.TO, addressTo); 
+			msg.addRecipients(MimeMessage.RecipientType.TO, addressTo); 
  
+			InternetAddress[] addressCC = new InternetAddress[_cc.length]; 
+			for (int i = 0; i < _cc.length; i++) { 
+				addressCC[i] = new InternetAddress(_cc[i]); 
+			} 
+			msg.addRecipients(MimeMessage.RecipientType.CC, addressCC); 
+			
 			msg.setSubject(_subject); 
 			msg.setSentDate(new Date()); 
  
@@ -149,7 +163,7 @@ public class Mail extends javax.mail.Authenticator {
 		props.put("mail.smtp.socketFactory.port", _sport); 
 		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); 
 		props.put("mail.smtp.socketFactory.fallback", "false"); 
- 
+		props.put("mail.smtp.ssl","true");
 		return props; 
 	} 
  
@@ -164,6 +178,10 @@ public class Mail extends javax.mail.Authenticator {
  
 	public void setTo(String[] toArr) {
 		this._to = toArr;
+	}
+	
+	public void setCC(String[] ccArr) {
+		this._cc = ccArr;
 	}
  
 	public void setFrom(String string) {

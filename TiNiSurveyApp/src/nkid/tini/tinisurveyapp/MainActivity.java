@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
 					int hour = cal.get(Calendar.HOUR_OF_DAY);
 					int minute = cal.get(Calendar.MINUTE);
 
-					if (hour == 23 && minute == 55)
+					if (hour == 0 && minute == 0)
 						sendEmail("Daily");
 				} catch (MessagingException e) {
 					// TODO Auto-generated catch block
@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
 					int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
 					int hour = cal.get(Calendar.HOUR_OF_DAY);
 					int minute = cal.get(Calendar.MINUTE);
-					if (dayOfWeek == Calendar.MONDAY && hour == 23 && minute == 55)
+					if (dayOfWeek == Calendar.MONDAY && hour == 0 && minute == 0)
 						sendEmail("Weekly");
 				} catch (MessagingException e) {
 					// TODO Auto-generated catch block
@@ -133,7 +133,7 @@ public class MainActivity extends Activity {
 					int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 					int hour = cal.get(Calendar.HOUR_OF_DAY);
 					int minute = cal.get(Calendar.MINUTE);
-					if (dayOfMonth == 1 && hour == 23 && minute == 55)
+					if (dayOfMonth == 1 && hour == 0 && minute == 0)
 						sendEmail("Monthly");
 				} catch (MessagingException e) {
 					// TODO Auto-generated catch block
@@ -154,11 +154,7 @@ public class MainActivity extends Activity {
 	public void addToDB(int vote) {
 		String name = "Parafait_Touch_Readers";
 
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-		String datetime = sdf.format(date);
-
-		Poll poll = new Poll(name, "", vote, datetime);
+		Poll poll = new Poll(name, "", vote, "");
 
 		mDB.addPoll(poll);
 	}
@@ -172,26 +168,32 @@ public class MainActivity extends Activity {
 
 	protected void sendEmail(String title) throws MessagingException {
 		
-		mail = new Mail("brightsunnigellus@gmail.com", "dathanielcarlfrancius");
-		String[] destAddr = { "nhat.nguyen@tiniplanet.com" };
+		mail = new Mail("nkidsurveyapp@gmail.com", "nkidsurveyreport");
+		String[] destAddr = { "khoa.do@nkidcorp.com" };
+		//String[] destAddr = { "nhat.nguyen@tiniplanet.com" };
+		String[] ccAddr = { "huy.mai@tiniplanet.com" };
 		mail.setTo(destAddr);
-		mail.setFrom("survey@nkidcorp.com");
-		mail.setSubject(title + " nKid Survey Report");
+		mail.setCC(ccAddr);
+		
+		mail.setFrom("nkidsurveyapp@gmail.com");
+		mail.setSubject("[Survey App] - " + title + " Report");
 		body = new String();
 
+		body += "Vote for : Parafait Touch Readers";
 		if (title.equals("Daily")) {
 			Date date = new Date();
+			Date yesterday = new Date(date.getTime() - (1000 * 60 * 60 * 24));
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			String curDate = sdf.format(date);
+			String curDate = sdf.format(yesterday);
 
 			int LikeNo = mDB.getTodayResult(curDate, 1);
 			int DontLikeNo = mDB.getTodayResult(curDate, -1);
 			int DontCareNo = mDB.getTodayResult(curDate, 0);
 
-			body += "Poll result for today " + curDate + ":";
-			body += "\n- Like : " + LikeNo;
-			body += "\n- Don't Like : " + DontLikeNo;
-			body += "\n- Don't Care : " + DontCareNo;
+			
+			body += "\n\t- Like : " + LikeNo;
+			body += "\n\t- Don't Like : " + DontLikeNo;
+			body += "\n\t- Don't Care : " + DontCareNo;
 		} else if (title.equals("Monthly")) {
 			Calendar cal = Calendar.getInstance();
 			int prevMonth = cal.get(Calendar.MONTH); 
@@ -206,30 +208,18 @@ public class MainActivity extends Activity {
 			int MonthDontLikeNo = mDB.getResultByMonth(prevMonth, year, -1);
 			int MonthDontCareNo = mDB.getResultByMonth(prevMonth, year, 0);
 
-			body += "\n\nThis month's results:";
-			body += "\n- Like : " + MonthLikeNo;
-			body += "\n- Don't Like : " + MonthDontLikeNo;
-			body += "\n- Don't Care : " + MonthDontCareNo;
+			body += "\n\t- Like : " + MonthLikeNo;
+			body += "\n\t- Don't Like : " + MonthDontLikeNo;
+			body += "\n\t- Don't Care : " + MonthDontCareNo;
 		} else if (title.equals("Weekly")) {
 			int WeekLikeNo = mDB.getResultByWeek(1);
 			int WeekDontLikeNo = mDB.getResultByWeek(-1);
 			int WeekDontCareNo = mDB.getResultByWeek(0);
 			
-			body += "\n\nThis week's results:";
-			body += "\n- Like : " + WeekLikeNo;
-			body += "\n- Don't Like : " + WeekDontLikeNo;
-			body += "\n- Don't Care : " + WeekDontCareNo;
+			body += "\n\t- Like : " + WeekLikeNo;
+			body += "\n\t- Don't Like : " + WeekDontLikeNo;
+			body += "\n\t- Don't Care : " + WeekDontCareNo;
 		}
-
-		int OvrLikeNo = mDB.getOverallResults(1);
-		int OvrDontLikeNo = mDB.getOverallResults(-1);
-		int OvrDontCareNo = mDB.getOverallResults(0);
-
-		body += "\n\nOverall results:";
-		body += "\n- Like : " + OvrLikeNo;
-		body += "\n- Don't Like : " + OvrDontLikeNo;
-		body += "\n- Don't Care : " + OvrDontCareNo;
-
 
 		mail.setBody(body);
 		new AsyncTask<Void, Void, Void>() {
@@ -248,12 +238,12 @@ public class MainActivity extends Activity {
 			}
 
 		}.execute();
-		notiSentMail();
+		notiSentMail(title);
 
 	}
 
-	void notiSentMail() {
-		Toast.makeText(this, "Email sent!", Toast.LENGTH_LONG).show();
+	void notiSentMail(String title) {
+		Toast.makeText(this, title + " mail sent!", Toast.LENGTH_LONG).show();
 	}
 
 	@Override

@@ -71,7 +71,6 @@ public class DBAdapter {
 		initialValues.put(KEY_NAME, poll.getName());
 		initialValues.put(KEY_DESCRIPTION, poll.getDescription());
 		initialValues.put(KEY_VOTE, poll.getVote());
-		//initialValues.put(KEY_DATETIME, poll.getDatetime());
 		
 		mDB.insertOrThrow(DATABASE_TABLE, null, initialValues);
 	}
@@ -104,8 +103,9 @@ public class DBAdapter {
 				KEY_VOTE + " = " + vote + " AND date(" + KEY_DATETIME 
 				+ ") = '" + date + "'", 
 				null, null, null, null);
-		
-		return mCursor.getCount();
+		int result = mCursor.getCount();
+		mCursor.close();
+		return result;
 	}
 	
 	public int getResultByMonth(int month, int year, int vote) {
@@ -115,7 +115,9 @@ public class DBAdapter {
 				+ " AND strftime('%Y', Datetime) = '" + year + "'",
 				null, null, null, null);
 		
-		return mCursor.getCount();
+		int result = mCursor.getCount();
+		mCursor.close();
+		return result;
 	}
 	
 	public int getResultByWeek(int vote) {
@@ -124,6 +126,8 @@ public class DBAdapter {
 						+ "AND date(" + KEY_DATETIME + ") < date('now', 'localtime'))",
 				null, null, null, null);
 		
-		return mCursor.getCount();
+		int result = mCursor.getCount();
+		mCursor.close();
+		return result;
 	}
 }
