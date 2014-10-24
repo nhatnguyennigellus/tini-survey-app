@@ -25,17 +25,37 @@ public final class R {
         public static final int dontcare=0x7f020000;
         public static final int dontlike=0x7f020001;
         public static final int ic_launcher=0x7f020002;
-        public static final int like=0x7f020003;
+        public static final int img_exit=0x7f020003;
+        public static final int img_ok=0x7f020004;
+        public static final int like=0x7f020005;
     }
     public static final class id {
         public static final int LinearLayout1=0x7f080000;
-        public static final int action_settings=0x7f080004;
+        public static final int TextView02=0x7f08000e;
+        public static final int TextView03=0x7f080010;
+        public static final int btnConfigCancel=0x7f080014;
+        public static final int btnConfigOK=0x7f080013;
+        public static final int btnTestMail=0x7f080012;
         public static final int imgbDontCare=0x7f080002;
         public static final int imgbDontLike=0x7f080003;
         public static final int imgbLike=0x7f080001;
+        public static final int miConfig=0x7f080015;
+        public static final int tableRow1=0x7f080008;
+        public static final int tableRow2=0x7f08000b;
+        public static final int tv=0x7f080009;
+        public static final int tvDontCareDaily=0x7f080005;
+        public static final int tvDontLikeDaily=0x7f080006;
+        public static final int tvLike=0x7f080007;
+        public static final int tvLikeDaily=0x7f080004;
+        public static final int tvPass=0x7f08000c;
+        public static final int txtFromEmail=0x7f08000a;
+        public static final int txtFromPass=0x7f08000d;
+        public static final int txtPIN=0x7f080011;
+        public static final int txtToList=0x7f08000f;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
+        public static final int config_dialog=0x7f030001;
     }
     public static final class menu {
         public static final int main=0x7f070000;
