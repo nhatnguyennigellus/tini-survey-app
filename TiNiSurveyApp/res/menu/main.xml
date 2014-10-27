@@ -7,5 +7,10 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="Config"/>
+    <item
+        android:id="@+id/miSendTest"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="Test mail"/>
 
 </menu>

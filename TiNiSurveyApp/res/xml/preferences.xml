@@ -1,0 +1,10 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <EditTextPreference
+        android:key="FromEmail"
+        android:title="Sender Email"
+        android:enabled="true" android:selectable="true" android:defaultValue="nkidsurveyapp@gmail.com"/>
+    <EditTextPreference android:password="true" android:title="Sender Password" android:key="FromPass" android:defaultValue="nkidsurveyreport"/>
+    <EditTextPreference android:title="Recipient" android:key="ToList" android:defaultValue="khoa.do@nkidcorp.com,huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com"/>
+    <EditTextPreference android:title="Waiting time" android:key="WaitingTime" android:defaultValue="2"/>
+
+</PreferenceScreen>

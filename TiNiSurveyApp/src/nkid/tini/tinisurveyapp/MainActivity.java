@@ -1,10 +1,5 @@
 package nkid.tini.tinisurveyapp;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,20 +11,16 @@ import nkid.tini.data.Poll;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
-import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -68,6 +59,14 @@ public class MainActivity extends Activity {
 		tvHeader.setText(header);
 		showDailyPoll();
 		SharedPreferences pref = getPreferences(MODE_PRIVATE);
+		
+		Intent intent = new Intent(this, SendEmailService.class);
+		intent.putExtra("FromEmail", pref.getString("FromEmail", "nkidsurveyapp@gmail.com"));
+		intent.putExtra("FromPass", "nkidsurveyreport");
+		intent.putExtra("ToList", pref.getString("ToList", 
+				"khoa.do@nkidcorp.com,huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com"));
+		startService(intent);
+		
 		imgbLike.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -114,6 +113,12 @@ public class MainActivity extends Activity {
 			}
 		});
 
+
+		
+		
+/*
+ * pref.getString("FromEmail", "nkidsurveyapp@gmail.com"), pref.getString(
+				"FromPass", "nkidsurveyreport")
 		CountDownTimer dailyTimer = new CountDownTimer(60000, 60000) {
 
 			@Override
@@ -188,7 +193,7 @@ public class MainActivity extends Activity {
 
 				this.start();
 			}
-		}.start();
+		}.start();*/
 	}
 
 	private void waiting(final ImageButton button, final int resId) {
@@ -251,21 +256,7 @@ public class MainActivity extends Activity {
 		body = new String();
 
 		body += "Vote for : Parafait Touch Readers";
-		if (title.equals("Previous Day")) {
-			mail.setSubject("[Survey App] - Daily Report");
-			Date date = new Date();
-			Date yesterday = new Date(date.getTime() - (1000 * 60 * 60 * 24));
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			String curDate = sdf.format(yesterday);
-
-			int LikeNo = mDB.getTodayResult(curDate, 1);
-			int DontLikeNo = mDB.getTodayResult(curDate, -1);
-			int DontCareNo = mDB.getTodayResult(curDate, 0);
-
-			body += "\n\t- Like : " + LikeNo;
-			body += "\n\t- Don't Like : " + DontLikeNo;
-			body += "\n\t- Don't Care : " + DontCareNo;
-		} else if (title.equals("Daily")) {
+		if (title.equals("Daily")) {
 			Date date = new Date();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			String curDate = sdf.format(date);
@@ -277,32 +268,7 @@ public class MainActivity extends Activity {
 			body += "\n\t- Like : " + LikeNo;
 			body += "\n\t- Don't Like : " + DontLikeNo;
 			body += "\n\t- Don't Care : " + DontCareNo;
-		} else if (title.equals("Monthly")) {
-			Calendar cal = Calendar.getInstance();
-			int prevMonth = cal.get(Calendar.MONTH);
-			int year = cal.get(Calendar.YEAR);
-			if (prevMonth == 0) {
-				prevMonth = 12;
-				year--;
-			}
-
-			int MonthLikeNo = mDB.getResultByMonth(prevMonth, year, 1);
-			int MonthDontLikeNo = mDB.getResultByMonth(prevMonth, year, -1);
-			int MonthDontCareNo = mDB.getResultByMonth(prevMonth, year, 0);
-
-			body += "\n\t- Like : " + MonthLikeNo;
-			body += "\n\t- Don't Like : " + MonthDontLikeNo;
-			body += "\n\t- Don't Care : " + MonthDontCareNo;
-		} else if (title.equals("Weekly")) {
-			int WeekLikeNo = mDB.getResultByWeek(1);
-			int WeekDontLikeNo = mDB.getResultByWeek(-1);
-			int WeekDontCareNo = mDB.getResultByWeek(0);
-
-			body += "\n\t- Like : " + WeekLikeNo;
-			body += "\n\t- Don't Like : " + WeekDontLikeNo;
-			body += "\n\t- Don't Care : " + WeekDontCareNo;
 		}
-
 		mail.setBody(body);
 		new AsyncTask<Void, Void, Boolean>() {
 			Exception error;
@@ -336,8 +302,6 @@ public class MainActivity extends Activity {
 		if (title.equals("Previous Day")) {
 			title = "Daily";
 		}
-		notiSentMail(title);
-
 	}
 	
 	void notiSentMail(String title) {
@@ -361,43 +325,28 @@ public class MainActivity extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		final Dialog dlgConfig = new Dialog(this);
+		final Dialog dlgPIN = new Dialog(this);
 		final SharedPreferences pref = getPreferences(MODE_PRIVATE);
+		dlgPIN.setContentView(R.layout.pin_input_dialog);
+		dlgPIN.setTitle("Nhập PIN");
+		final EditText txtPIN = (EditText) dlgPIN
+				.findViewById(R.id.txtPIN);
+		Button btnOK = (Button) dlgPIN.findViewById(R.id.btnConfigOK);
+		Button btnCancel = (Button) dlgPIN
+				.findViewById(R.id.btnConfigCancel);
+		
+		btnCancel.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				dlgPIN.cancel();
+			}
+		});
+
+		
 		if (id == R.id.miConfig) {
-			dlgConfig.setContentView(R.layout.config_dialog);
-			dlgConfig.setTitle("Cấu hình");
-			final EditText txtEmail = (EditText) dlgConfig
-					.findViewById(R.id.txtFromEmail);
-			final EditText txtPassword = (EditText) dlgConfig
-					.findViewById(R.id.txtFromPass);
-			final EditText txtToList = (EditText) dlgConfig
-					.findViewById(R.id.txtToList);
-			final EditText txtWatingTime = (EditText) dlgConfig
-					.findViewById(R.id.txtWaitingTime);
-			final EditText txtPIN = (EditText) dlgConfig
-					.findViewById(R.id.txtPIN);
-			Button btnTest = (Button) dlgConfig.findViewById(R.id.btnTestMail);
-			Button btnOK = (Button) dlgConfig.findViewById(R.id.btnConfigOK);
-			Button btnCancel = (Button) dlgConfig
-					.findViewById(R.id.btnConfigCancel);
-
-			txtEmail.setText(pref.getString("FromEmail",
-					"nkidsurveyapp@gmail.com"));
-			txtPassword.setText(pref.getString("FromPass", "nkidsurveyreport"));
-			txtWatingTime.setText(String.valueOf(pref.getInt("WaitingTime", 2)));
-			txtToList
-					.setText(pref
-							.getString("ToList",
-									"huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com"));
-			btnCancel.setOnClickListener(new View.OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					dlgConfig.cancel();
-				}
-			});
-
+			
 			btnOK.setOnClickListener(new View.OnClickListener() {
 
 				@SuppressLint("CommitPrefEdits")
@@ -406,55 +355,73 @@ public class MainActivity extends Activity {
 					// TODO Auto-generated method stub
 
 					if (txtPIN.getText().toString().equals("09092014")) {
-
-						SharedPreferences.Editor editor = pref.edit();
-						editor.putString("FromEmail", txtEmail.getText()
-								.toString());
-						editor.putString("FromPass", txtPassword.getText()
-								.toString());
-						editor.putString("ToList", txtToList.getText()
-								.toString());
-						int waitingTime;
-						try {
-							waitingTime = Integer.parseInt(txtWatingTime.getText().toString());
-						}
-						catch (Exception error){
-							waitingTime = 2;
-						}
-						if (waitingTime < 1)
-							waitingTime = 1;
-						editor.putInt("WaitingTime",waitingTime);
-						editor.commit();
-						errNoti("Cấu hình thành công");
-						dlgConfig.cancel();
+						dlgPIN.cancel();
+						goConfig();
+						
 					} else {
 						errNoti("Mã PIN chưa đúng! Vui lòng nhập lại");
 
 					}
 				}
+
+				
 			});
+			
+		} else if (id == R.id.miSendTest) {
+			btnOK.setOnClickListener(new View.OnClickListener() {
 
-			btnTest.setOnClickListener(new View.OnClickListener() {
-
+				@SuppressLint("CommitPrefEdits")
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					try {
-						// Check pin vaild
-						if (txtPIN.getText().toString().equals("09092014")) {
+
+					if (txtPIN.getText().toString().equals("09092014")) {
+						dlgPIN.cancel();
+						try {
 							sendEmail("Daily");
-						} else {
-							errNoti("Wrong pin");
+						} catch (MessagingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					} catch (MessagingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						
+					} else {
+						errNoti("Mã PIN chưa đúng! Vui lòng nhập lại");
+
 					}
 				}
-			});
 
-			dlgConfig.show();
+				
+			});
 		}
+		
+		dlgPIN.show();
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void goConfig() {
+		Intent intent = new Intent(this, ConfigActivity.class);
+		startActivityForResult(intent, 1);
+	}
+	
+	@SuppressLint("ShowToast")
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == 1) {
+			SharedPreferences prefSet = PreferenceManager.getDefaultSharedPreferences(this);
+			SharedPreferences prefMain = getPreferences(MODE_PRIVATE);
+			SharedPreferences.Editor editor = prefMain.edit();
+			
+			editor.putString("FromEmail", prefSet.getString("FromEmail", ""));
+			editor.putString("FromPass", prefSet.getString("FromPass", ""));
+			editor.putString("ToList", prefSet.getString("ToList", ""));
+			editor.putInt("WaitingTime", Integer.parseInt(prefSet.getString("WaitingTime", "2")));
+			
+			editor.commit();
+			Toast.makeText(this, "Cấu hình thành công!", Toast.LENGTH_SHORT).show();
+		}
+		
+		
 	}
 }

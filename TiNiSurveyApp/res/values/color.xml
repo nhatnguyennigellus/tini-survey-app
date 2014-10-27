@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="likeButtonNormal">#00b0ff</color>
-    <color name="likeButtonPress">#01579b</color>
+    <color name="dontCareButtonNormal">#00b0ff</color>
+    <color name="dontCareButtonPress">#01579b</color>
     
-    <color name="dontCareButtonNormal">#ffea00</color>
-    <color name="dontCareButtonPress">#f57f17</color>
+    <color name="dontLikeButtonNormal">#F7D358</color>
+    <color name="dontLikeButtonPress">#F78181</color>
     
-    <color name="dontLikeButtonNormal">#14e715</color>
-    <color name="dontLikeButtonPress">#0d5302</color>
+    <color name="likeButtonNormal">#14e715</color>
+    <color name="likeButtonPress">#0d5302</color>
 
 </resources>

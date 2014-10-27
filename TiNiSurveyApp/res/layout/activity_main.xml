@@ -45,7 +45,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#0099CC"
+            android:background="#31B404"
             android:gravity="center"
             android:text="Thích"
             android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -54,7 +54,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#FF8800"
+            android:background="#0099CC"
             android:gravity="center"
             android:text="Không quan tâm"
             android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -63,7 +63,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#669900"
+            android:background="#FE642E"
             android:gravity="center"
             android:text="Không thích"
             android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -113,7 +113,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#0099CC"
+            android:background="#31B404"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -122,7 +122,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#FF8800"
+            android:background="#0099CC"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -131,7 +131,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#669900"
+            android:background="#FE642E"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
