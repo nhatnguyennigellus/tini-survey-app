@@ -1,7 +1,6 @@
 package nkid.tini.tinisurveyapp;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -11,9 +10,7 @@ import nkid.tini.data.DBAdapter;
 import nkid.tini.data.Poll;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -39,8 +36,6 @@ public class MainActivity extends Activity {
 	static DBAdapter mDB;
 	private Mail mail;
 	private Boolean canClick = true;
-	
-	private PendingIntent pendingIntent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +57,7 @@ public class MainActivity extends Activity {
 		DateFormat df = new DateFormat();
 		String header = df.format("dd-MM-yyyy", new Date()).toString();
 		tvHeader.setText(header);
-		showDailyPoll();/*
+		showDailyPoll();
 		SharedPreferences pref = getPreferences(MODE_PRIVATE);
 		
 		Intent intent = new Intent(this, SendEmailService.class);
@@ -71,8 +66,6 @@ public class MainActivity extends Activity {
 		intent.putExtra("ToList", pref.getString("ToList", 
 				"khoa.do@nkidcorp.com,huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com"));
 		startService(intent);
-		*/setMailAlarm();
-		new Intent(this, AlarmReceiver.class);
 		
 		imgbLike.setOnClickListener(new View.OnClickListener() {
 
@@ -122,66 +115,85 @@ public class MainActivity extends Activity {
 
 
 		
-	}
+		
+/*
+ * pref.getString("FromEmail", "nkidsurveyapp@gmail.com"), pref.getString(
+				"FromPass", "nkidsurveyreport")
+		CountDownTimer dailyTimer = new CountDownTimer(60000, 60000) {
 
-	private void setMailAlarm() {
-		SharedPreferences pref = getPreferences(MODE_PRIVATE);
-		String fromEmail = pref.getString("FromEmail", "nkidsurveyapp@gmail.com");
-		String fromPass = pref.getString("FromPass", "nkidsurveyreport");
-		String toList = pref.getString("ToList", 
-				"khoa.do@nkidcorp.com,huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com");
-		AlarmManager manager = (AlarmManager)this.getSystemService(ALARM_SERVICE);
-		
-		
-		// Set daily alarm
-		Intent intentDaily = new Intent(this, AlarmReceiver.class);
-		intentDaily.putExtra("FromEmail", fromEmail);
-		intentDaily.putExtra("FromPass", fromPass);
-		intentDaily.putExtra("ToList", toList);
-		intentDaily.putExtra("MailType", "Daily");
-		pendingIntent = 
-				PendingIntent.getBroadcast(this, 1, intentDaily, PendingIntent.FLAG_CANCEL_CURRENT);
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeInMillis(System.currentTimeMillis());
-		cal.add(Calendar.DAY_OF_YEAR, 1);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		manager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(),
-				AlarmManager.INTERVAL_DAY, pendingIntent);
-		
-		//Set monthly alarm
-		Intent intentMonthly = new Intent(this, AlarmReceiver.class);
-		intentMonthly.putExtra("FromEmail", fromEmail);
-		intentMonthly.putExtra("FromPass", fromPass);
-		intentMonthly.putExtra("ToList", toList);
-		intentMonthly.putExtra("MailType", "Monthly");
-		pendingIntent = 
-				PendingIntent.getBroadcast(this, 2, intentMonthly, PendingIntent.FLAG_CANCEL_CURRENT);
-		Calendar calMonth = Calendar.getInstance();
-		calMonth.setTimeInMillis(System.currentTimeMillis());
-		calMonth.add(Calendar.MONTH, 1);
-		calMonth.set(Calendar.DATE, 1);
-		calMonth.set(Calendar.HOUR_OF_DAY, 0);
-		calMonth.set(Calendar.MINUTE, 0);
-		manager.set(AlarmManager.RTC_WAKEUP, calMonth.getTimeInMillis(), pendingIntent);
-		
-		//Set weekly alarm
-		Intent intentWeekly = new Intent(this, AlarmReceiver.class);
-		intentWeekly.putExtra("FromEmail", fromEmail);
-		intentWeekly.putExtra("FromPass", fromPass);
-		intentWeekly.putExtra("ToList", toList);
-		intentWeekly.putExtra("MailType", "Weekly");
-		pendingIntent = 
-				PendingIntent.getBroadcast(this, 3, intentWeekly, PendingIntent.FLAG_CANCEL_CURRENT);
-		Calendar calWeek = Calendar.getInstance();
-		calWeek.setTimeInMillis(System.currentTimeMillis());
-		calWeek.add(Calendar.WEEK_OF_MONTH, 1);
-		calWeek.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-		calWeek.set(Calendar.HOUR_OF_DAY, 0);
-		calWeek.set(Calendar.MINUTE, 0);
-		manager.setRepeating(AlarmManager.RTC_WAKEUP, calMonth.getTimeInMillis(), 
-			AlarmManager.INTERVAL_DAY * 7, pendingIntent);
-		//pendingIntentList.add(pendingIntent);
+			@Override
+			public void onTick(long millisUntilFinished) {
+				// TODO Auto-generated method stub
+				try {
+					Calendar cal = Calendar.getInstance();
+					int hour = cal.get(Calendar.HOUR_OF_DAY);
+					int minute = cal.get(Calendar.MINUTE);
+
+					if (hour == 0 && minute == 0)
+						sendEmail("Previous Day");
+				} catch (MessagingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void onFinish() {
+				this.start();
+			}
+		}.start();
+
+		CountDownTimer weeklyTimer = new CountDownTimer(60000, 60000) {
+
+			@Override
+			public void onTick(long millisUntilFinished) {
+				// TODO Auto-generated method stub
+				try {
+					Calendar cal = Calendar.getInstance();
+					int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+					int hour = cal.get(Calendar.HOUR_OF_DAY);
+					int minute = cal.get(Calendar.MINUTE);
+					if (dayOfWeek == Calendar.MONDAY && hour == 0
+							&& minute == 0)
+						sendEmail("Weekly");
+				} catch (MessagingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void onFinish() {
+
+				this.start();
+			}
+		}.start();
+
+		CountDownTimer monthlyTimer = new CountDownTimer(60000, 60000) {
+
+			@Override
+			public void onTick(long millisUntilFinished) {
+				// TODO Auto-generated method stub
+				try {
+					Calendar cal = Calendar.getInstance();
+					int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+					int hour = cal.get(Calendar.HOUR_OF_DAY);
+					int minute = cal.get(Calendar.MINUTE);
+					if (dayOfMonth == 1 && hour == 0 && minute == 0)
+						sendEmail("Monthly");
+				} catch (MessagingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+			@Override
+			public void onFinish() {
+
+				this.start();
+			}
+		}.start();*/
 	}
 
 	private void waiting(final ImageButton button, final int resId) {

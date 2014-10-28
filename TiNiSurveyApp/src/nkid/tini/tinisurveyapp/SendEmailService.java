@@ -13,14 +13,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.os.Looper;
 import android.widget.Toast;
 
 public class SendEmailService extends IntentService {
 
 	String fromEmail, fromPass, toList;
 	DBAdapter mDB;
-
 	public SendEmailService() {
 		super("SendEmailService");
 		// TODO Auto-generated constructor stub
@@ -29,36 +27,34 @@ public class SendEmailService extends IntentService {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO Auto-generated method stub
-
-		return START_STICKY;
+		
+		return super.onStartCommand(intent, flags, startId);
 	}
-
+	
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		// TODO Auto-generated method stub
 		Bundle extra = intent.getExtras();
 		if (extra != null) {
-			this.fromEmail = extra.getString("FromEmail",
-					"nkidsurveyapp@gmail.com");
+			this.fromEmail = extra.getString("FromEmail", "nkidsurveyapp@gmail.com");
 			this.fromPass = extra.getString("FromPass", "nkidsurveyreport");
-			this.toList = extra
-					.getString("ToList",
-							"khoa.do@nkidcorp.com,huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com");
-
+			this.toList = extra.getString("ToList", 
+					"khoa.do@nkidcorp.com,huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com");
+			
+			
 		}
+		
 		mDB = new DBAdapter(this);
 		mDB.open();
 		
-
+		
 	}
 	
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
-		
 		super.onCreate();
 		Toast.makeText(this, "Service starting", Toast.LENGTH_SHORT).show();
-		
 		CountDownTimer dailyTimer = new CountDownTimer(60000, 60000) {
 
 			@Override
@@ -135,20 +131,20 @@ public class SendEmailService extends IntentService {
 			}
 		}.start();
 	}
+	
 
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return super.onBind(intent);
 	}
-
+	
 	private Mail mail;
 	String body = "";
-
 	protected void sendEmail(String title) throws MessagingException {
 		mail = new Mail(this.fromEmail, this.fromPass);
 		String[] destAddr = toList.split(",");
-		String[] ccAddr = { "thanhhuy89vn@gmail.com" };
+		String[] ccAddr = {"thanhhuy89vn@gmail.com"};
 		mail.setTo(destAddr);
 		mail.setCC(ccAddr);
 		mail.setFrom("nkidsurveyapp@gmail.com");
@@ -156,9 +152,9 @@ public class SendEmailService extends IntentService {
 		body = new String();
 
 		body += "Vote for : Parafait Touch Readers";
-
+		
 		if (title.equals("Daily")) {
-			// mail.setSubject("[Survey App] - Daily Report");
+	//		mail.setSubject("[Survey App] - Daily Report");
 			Date date = new Date();
 			Date yesterday = new Date(date.getTime() - (1000 * 60 * 60 * 24));
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -200,7 +196,6 @@ public class SendEmailService extends IntentService {
 		mail.setBody(body);
 		new AsyncTask<Void, Void, Boolean>() {
 			Exception error;
-
 			@Override
 			protected Boolean doInBackground(Void... params) {
 				// TODO Auto-generated method stub
@@ -214,28 +209,27 @@ public class SendEmailService extends IntentService {
 					return false;
 				}
 			}
-
+			
 			@Override
-			protected void onPostExecute(Boolean result) {
-				if (result) {
-					errNoti("Gửi email thành công");
-				} else {
-					if (error != null)
-						errNoti("Gửi email thất bại. Nguyên nhân: "
-								+ error.toString());
-					else
-						errNoti("Gửi email thất bại. Khong rõ nguyên nhân: ");
-				}
-			}
+		    protected void onPostExecute(Boolean result) {
+		        if (result) {
+		        	errNoti("Gửi email thành công");
+		         } else {
+		            if (error != null)
+		                errNoti("Gửi email thất bại. Nguyên nhân: " + error.toString());
+		            else 
+		            	errNoti("Gửi email thất bại. Khong rõ nguyên nhân: ");
+		        }
+		    }
 
 		}.execute();
-		/*
-		 * if (title.equals("Previous Day")) { title = "Daily"; }
-		 */
+	/*	if (title.equals("Previous Day")) {
+			title = "Daily";
+		}*/
 		notiSentMail(title);
 
 	}
-
+	
 	void notiSentMail(String title) {
 		Toast.makeText(this, title + " mail sent!", Toast.LENGTH_SHORT).show();
 	}

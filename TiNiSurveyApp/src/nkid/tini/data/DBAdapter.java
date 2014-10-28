@@ -1,6 +1,5 @@
 package nkid.tini.data;
 
-import nkid.tini.tinisurveyapp.SendEmailService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -32,7 +31,6 @@ public class DBAdapter {
 	public DBAdapter(Context ctx) {
 		this.mContext = ctx;
 	}
-	
 	
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
