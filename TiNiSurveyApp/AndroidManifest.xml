@@ -26,9 +26,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name=".SendEmailService" />
-
+        <receiver android:name=".AlarmReceiver"></receiver>
+        <receiver android:name=".ServiceAutoLauncher"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".ConfigActivity"
             android:label="@string/title_activity_config"
@@ -37,6 +41,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="android.preference.PreferenceActivity" />
         </activity>
+        
     </application>
-
+	<uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 </manifest>
