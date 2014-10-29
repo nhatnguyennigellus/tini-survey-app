@@ -142,6 +142,7 @@ public class MainActivity extends Activity {
 		pendingIntent = 
 				PendingIntent.getBroadcast(this, 1, intentDaily, PendingIntent.FLAG_CANCEL_CURRENT);
 		Calendar cal = Calendar.getInstance();
+		DateFormat df = new DateFormat();
 		cal.setTimeInMillis(System.currentTimeMillis());
 		cal.add(Calendar.DAY_OF_YEAR, 1);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -175,13 +176,11 @@ public class MainActivity extends Activity {
 				PendingIntent.getBroadcast(this, 3, intentWeekly, PendingIntent.FLAG_CANCEL_CURRENT);
 		Calendar calWeek = Calendar.getInstance();
 		calWeek.setTimeInMillis(System.currentTimeMillis());
-		calWeek.add(Calendar.WEEK_OF_MONTH, 1);
 		calWeek.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+		calWeek.add(Calendar.WEEK_OF_MONTH, 1);
 		calWeek.set(Calendar.HOUR_OF_DAY, 0);
 		calWeek.set(Calendar.MINUTE, 0);
-		manager.setRepeating(AlarmManager.RTC_WAKEUP, calMonth.getTimeInMillis(), 
-			AlarmManager.INTERVAL_DAY * 7, pendingIntent);
-		//pendingIntentList.add(pendingIntent);
+		manager.set(AlarmManager.RTC_WAKEUP, calWeek.getTimeInMillis(), pendingIntent);
 	}
 
 	private void waiting(final ImageButton button, final int resId) {
@@ -307,6 +306,12 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		mDB.close();
+	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will

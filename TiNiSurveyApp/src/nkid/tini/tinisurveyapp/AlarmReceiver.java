@@ -126,9 +126,6 @@ public class AlarmReceiver extends BroadcastReceiver {
 			}
 
 		}.execute();
-		/*
-		 * if (title.equals("Previous Day")) { title = "Daily"; }
-		 */
 		
 		Toast.makeText(ctx, "Gửi email thành công", Toast.LENGTH_SHORT).show();
 		
