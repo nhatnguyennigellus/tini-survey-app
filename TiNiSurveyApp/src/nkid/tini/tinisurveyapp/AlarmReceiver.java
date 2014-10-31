@@ -23,6 +23,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context ctx, Intent intent) {
 		// TODO Auto-generated method stub
+		
 		Bundle extra = intent.getExtras();
 		
 		if (extra != null) {
@@ -44,8 +45,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 			e.printStackTrace();
 		}
 		mDB.close();
+		
 	}
-
 
 	private Mail mail;
 	String body = "";

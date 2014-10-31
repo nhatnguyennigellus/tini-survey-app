@@ -12,5 +12,9 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="Test mail"/>
-
+	<item
+        android:id="@+id/miExportDb"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="Export data"/>
 </menu>

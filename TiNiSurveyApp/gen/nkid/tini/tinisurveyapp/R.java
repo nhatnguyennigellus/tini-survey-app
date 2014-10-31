@@ -57,6 +57,7 @@ public final class R {
         public static final int imgbDontLike=0x7f0b0004;
         public static final int imgbLike=0x7f0b0002;
         public static final int miConfig=0x7f0b000d;
+        public static final int miExportDb=0x7f0b000f;
         public static final int miSendTest=0x7f0b000e;
         public static final int tvDontCareDaily=0x7f0b0006;
         public static final int tvDontLikeDaily=0x7f0b0007;

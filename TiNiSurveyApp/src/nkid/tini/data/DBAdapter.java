@@ -1,12 +1,18 @@
 package nkid.tini.data;
 
-import nkid.tini.tinisurveyapp.SendEmailService;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
+
+import android.R.bool;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 
 public class DBAdapter {
 	public static final String KEY_ID = "Id";
@@ -55,6 +61,39 @@ public class DBAdapter {
 			onCreate(db);
 		}
 
+	}
+	
+	public void export() {
+		File sd = Environment.getExternalStorageDirectory();
+		File data = Environment.getDataDirectory();
+		
+		FileChannel source = null;
+		FileChannel destination = null;
+		
+		File pkgFolder = new File(sd + "/Android/data/nkid.tini.data");
+		if (!pkgFolder.exists()) {
+			pkgFolder.mkdir();
+		}
+		
+		String currentDBPath = "/data/" + "nkid.tini.tinisurveyapp" + "/databases/" + DATABASE_NAME;
+		String backupDBPath = "/Android/data/nkid.tini.data/" + DATABASE_NAME;
+		
+		
+		boolean success = true;
+		
+		if (success) {
+			File currentDB = new File(data, currentDBPath);
+			File backupDB = new File(sd, backupDBPath);
+			try {
+				source = new FileInputStream(currentDB).getChannel();
+				destination = new FileOutputStream(backupDB).getChannel();
+				destination.transferFrom(source, 0, source.size());
+				source.close();
+				destination.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
 	}
 	
 	public DBAdapter open() {

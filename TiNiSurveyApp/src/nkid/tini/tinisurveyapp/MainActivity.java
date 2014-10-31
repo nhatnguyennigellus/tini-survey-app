@@ -1,7 +1,6 @@
 package nkid.tini.tinisurveyapp;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -14,8 +13,10 @@ import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -50,6 +51,8 @@ public class MainActivity extends Activity {
 		
 		mDB = new DBAdapter(this);
 		mDB.open();
+		
+		
 
 		imgbLike = (ImageButton) this.findViewById(R.id.imgbLike);
 		imgbDontCare = (ImageButton) this.findViewById(R.id.imgbDontCare);
@@ -71,8 +74,15 @@ public class MainActivity extends Activity {
 		intent.putExtra("ToList", pref.getString("ToList", 
 				"khoa.do@nkidcorp.com,huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com"));
 		startService(intent);
-		*/setMailAlarm();
-		new Intent(this, AlarmReceiver.class);
+		
+		*/
+		setMailAlarm();
+		ComponentName receiver = new ComponentName(this, AlarmReceiver.class);
+		PackageManager pm = this.getPackageManager();
+
+		pm.setComponentEnabledSetting(receiver,
+		        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+		        PackageManager.DONT_KILL_APP);
 		
 		imgbLike.setOnClickListener(new View.OnClickListener() {
 
@@ -119,18 +129,16 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
-
-
-		
 	}
 
-	private void setMailAlarm() {
+	
+	public void setMailAlarm() {
 		SharedPreferences pref = getPreferences(MODE_PRIVATE);
 		String fromEmail = pref.getString("FromEmail", "nkidsurveyapp@gmail.com");
 		String fromPass = pref.getString("FromPass", "nkidsurveyreport");
 		String toList = pref.getString("ToList", 
 				"khoa.do@nkidcorp.com,huy.mai@tiniplanet.com,nhat.nguyen@tiniplanet.com");
-		AlarmManager manager = (AlarmManager)this.getSystemService(ALARM_SERVICE);
+		AlarmManager manager = (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
 		
 		
 		// Set daily alarm
@@ -181,6 +189,8 @@ public class MainActivity extends Activity {
 		calWeek.set(Calendar.HOUR_OF_DAY, 0);
 		calWeek.set(Calendar.MINUTE, 0);
 		manager.set(AlarmManager.RTC_WAKEUP, calWeek.getTimeInMillis(), pendingIntent);
+		
+		
 	}
 
 	private void waiting(final ImageButton button, final int resId) {
@@ -234,8 +244,9 @@ public class MainActivity extends Activity {
 		SharedPreferences pref = getPreferences(MODE_PRIVATE);
 		mail = new Mail(pref.getString("FromEmail", "nkidsurveyapp@gmail.com"), pref.getString(
 				"FromPass", "nkidsurveyreport"));
-		String[] destAddr = pref.getString("ToList", "huy.mai@tiniplanet.com").split(",");
-		String[] ccAddr = {"thanhhuy89vn@gmail.com"};
+		String[] destAddr = pref.getString("ToList", 
+				"nhat.nguyen@tiniplanet.com,khoa.do@nkidcorp.com,huy.mai@tiniplanet.com").split(",");
+		String[] ccAddr = {"brightsunnigellus@gmail.com"};
 		mail.setTo(destAddr);
 		mail.setCC(ccAddr);
 		mail.setFrom("nkidsurveyapp@gmail.com");
@@ -385,8 +396,34 @@ public class MainActivity extends Activity {
 
 				
 			});
-		}
+		} else if (id == R.id.miExportDb) {
+			btnOK.setOnClickListener(new View.OnClickListener() {
+
+				@SuppressLint("CommitPrefEdits")
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+
+					if (txtPIN.getText().toString().equals("09092014")) {
+						dlgPIN.cancel();
+						try {
+							mDB.export();
+							errNoti("Data exported!");
+						} catch (Exception e) {
+							// TODO: handle exception
+							errNoti("Data export failed!");
+						}
+						
+					} else {
+						errNoti("Mã PIN chưa đúng! Vui lòng nhập lại");
+
+					}
+				}
+
+				
+			});
 		
+		} 
 		dlgPIN.show();
 		return super.onOptionsItemSelected(item);
 	}
